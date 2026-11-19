@@ -1,21 +1,24 @@
 """健康检查。"""
 import time
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from app.core.auth import require_auth
 from app.core.response import ok
 from app.core.time import iso_cn, now_utc
 
 router = APIRouter()
 
 _START_TS = time.time()
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 
 @router.get("/health", tags=["system"])
 async def health():
+    from app.core.auth import auth_enabled
     return {
         "status": "ok",
+        "auth_enabled": auth_enabled(),
         "timestamp": iso_cn(now_utc()),
         "timezone": "Asia/Shanghai (UTC+8)",
         "version": VERSION,
@@ -24,7 +27,8 @@ async def health():
 
 
 @router.get("/api/v1/config", tags=["system"])
-async def config():
+async def config(_: None = Depends(require_auth)):
+    # 配置里虽无密钥，但含版本/交易对信息，验证开启时同样要登录
     from app.services.exchange import DEFAULT_SYMBOLS
     from app.config import settings
     return ok({

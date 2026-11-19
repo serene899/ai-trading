@@ -29,6 +29,11 @@ http.interceptors.response.use(
       console.warn('[api] transient error:', err.message)
       return Promise.reject(err)
     }
+    if (err.response?.status === 401 && !err.config?.url?.includes('/auth/')) {
+      // 会话失效：通知 App 显示登录页，不弹红条
+      window.dispatchEvent(new CustomEvent('auth:required'))
+      return Promise.reject(err)
+    }
     const msg =
       err.response?.data?.detail ||
       err.response?.data?.message ||
@@ -201,6 +206,11 @@ export interface Bot {
 // -------- API --------
 export const api = {
   health: () => http.get('/health'),
+  authStatus: () =>
+    http.get<any, { auth_enabled: boolean; authenticated: boolean }>('/api/v1/auth/status'),
+  login: (password: string) =>
+    http.post<any, { auth_enabled: boolean; authenticated: boolean }>('/api/v1/auth/login', { password }),
+  logout: () => http.post<any, { authenticated: boolean }>('/api/v1/auth/logout'),
   config: () =>
     http.get<any, { exchange: string; symbols: string[]; version: string }>(
       '/api/v1/config'

@@ -18,6 +18,18 @@ class Settings(BaseSettings):
     #   接管时已删除，避免日后误接实盘。
     EXCHANGE: str = "okx"
 
+    # Auth（v1.2.0 单用户登录验证，见 app/core/auth.py）
+    # 密码哈希与会话密钥只从环境变量/.env 读，永不写进代码或仓库。
+    AUTH_PASSWORD_HASH: str = ""
+    # 次选：明文密码环境变量（方便手机上在云平台填环境变量部署）；启动后只在内存中哈希，不落盘
+    AUTH_PASSWORD: str = ""
+    SESSION_SECRET: str = ""
+    # 部署时设 1：验证未配置好就拒绝启动（fail-closed）
+    REQUIRE_AUTH: bool = False
+    # 部署在 HTTPS 后面时设 1：会话 Cookie 只走 HTTPS
+    COOKIE_SECURE: bool = False
+    SESSION_DAYS: int = 7
+
     # Account
     INITIAL_CAPITAL: float = 10000.0
 

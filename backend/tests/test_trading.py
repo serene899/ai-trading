@@ -22,12 +22,10 @@ import pytest
 BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BACKEND_DIR)
 
-_TMP = tempfile.mkdtemp(prefix="ai-trading-test-")
-DB_FILE = os.path.join(_TMP, "test.db")
-os.environ["DB_PATH"] = DB_FILE
-os.environ["FEE_RATE"] = "0.001"
-os.environ["SLIPPAGE_PCT"] = "0"  # 关滑点，专心核对手续费/盈亏数学
-os.environ["INITIAL_CAPITAL"] = "10000"
+# 环境变量由 conftest.py 在收集阶段统一设置（DB_PATH 等），这里只读不写，
+# 避免多个测试文件 import 顺序不同把 app 配置冻结成不同的值。
+DB_FILE = os.environ["DB_PATH"]
+_TMP = os.path.dirname(DB_FILE)
 
 PRICE = {"v": 100.0}
 
@@ -178,7 +176,7 @@ def test_api_account_and_analysis():
 
     with TestClient(app) as client:
         r = client.get("/health")
-        assert r.status_code == 200 and r.json()["version"] == "1.1.0"
+        assert r.status_code == 200 and r.json()["version"] == "1.2.0"
 
         r = client.get("/api/v1/account")
         assert r.status_code == 200
