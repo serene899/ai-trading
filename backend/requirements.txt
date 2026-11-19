@@ -1,0 +1,11 @@
+# 依赖锁版本（2026-11-19 接管修复 P0）
+# 教训：旧版故意不锁版本，2026-11 新版 sqlmodel(0.0.50) 拒绝 naive datetime 入库，
+# 导致全新安装 init_db 即崩。以下版本为实测可用的组合，升级任何一项先跑 backend/tests。
+fastapi==0.165.0
+uvicorn[standard]==0.54.0
+httpx==0.28.1
+pydantic==2.14.3
+pydantic-settings==2.16.3
+python-dotenv==1.2.4
+sqlmodel==0.0.50
+SQLAlchemy==2.1.9

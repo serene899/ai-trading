@@ -1,0 +1,2 @@
+# 测试依赖（运行 backend/tests 用）
+pytest>=8.0
