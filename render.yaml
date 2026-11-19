@@ -1,0 +1,25 @@
+# Render 一键蓝图：在 Render 里选 New → Blueprint → 连接本仓库即可，
+# 服务规格、持久磁盘、环境变量都已预设，只需在开通时填一个登录密码（AUTH_PASSWORD）。
+# 详见 docs/部署方案.md 路线 A。
+services:
+  - type: web
+    name: ai-trading
+    runtime: docker
+    plan: starter # $7/月，免费版会休眠且数据不持久，不可用
+    region: singapore # 离国内最近的区域
+    healthCheckPath: /health
+    disk:
+      name: ai-trading-data
+      mountPath: /data
+      sizeGB: 1 # $0.25/月，SQLite 账本足够
+    envVars:
+      - key: REQUIRE_AUTH
+        value: "1" # 密码没配好就拒绝启动
+      - key: COOKIE_SECURE
+        value: "1"
+      - key: DB_PATH
+        value: /data/data.db
+      - key: SESSION_SECRET
+        generateValue: true # 平台自动生成，不用自己想
+      - key: AUTH_PASSWORD
+        sync: false # 开通时在页面上填，只有你自己知道，不要发给任何人
